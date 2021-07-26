@@ -1,0 +1,74 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %} Post list {% endblock title %}
+
+{% block content %}
+
+<table>
+    <thead>
+        <th>
+            Title
+        </th>
+        <th>
+            Category
+        </th>
+        <th>
+            Text
+        </th>
+        <th>
+            Author
+        </th>
+        <th>
+            Datetime
+        </th>
+    </thead>
+    {% for post in filter.qs %} <!-- поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+    <tr>
+        <td>
+            <a href="{% url 'post_detail' product.id %}">{{ post.title }}</a> <!-- При нажатии на имя товара в таблцие нас теперь будет перекидывать на страницу с самого товара -->
+            <a href="{% url 'post_update' product.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
+
+            <a href="{% url 'post_delete' product.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
+        </td>
+        <td>
+            {{ post.category }}
+        </td>
+        <td>
+            {{ post.text }}
+        </td>
+        <td>
+            {{ post.author }}
+        </td>
+        <td>
+            {{ post.datetime }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'post_create' %}">Добавить новый пост</a> <br>
+
+
+{% if is_paginated %}
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+{% endif %}
+<br>
+
+{% endblock content %}

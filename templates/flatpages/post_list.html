@@ -1,0 +1,98 @@
+{% extends 'sample_app/base.html' %}
+
+{% block title %} Post list {% endblock title %}
+
+{% block content %}
+<form method="GET">
+    {{ filter.form }}
+    <input type="submit" value="Найти">
+</form>
+
+<table>
+    <thead>
+        <th>
+            Title
+        </th>
+        <th>
+            Author
+        </th>
+        <th>
+            Preview
+        </th>
+        <th>
+            Rating
+        </th>
+        <th>
+            Datetime
+        </th>
+    </thead>
+    {% for post in filter.qs %} <!-- поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+    <tr>
+        <td>
+            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a> <!-- При нажатии на имя товара в таблице нас теперь будет перекидывать на страницу с информацией о товаре -->
+        </td>
+        <td>
+            {{ post.author }}
+        </td>
+        <td>
+            {{ post.preview }}
+        </td>
+        <td>
+            {{ post.rating }}
+        </td>
+        <td>
+            {{ post.datetime }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% if is_paginated %}
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="title">Title</label>
+    <input name="title" type="text">
+
+    <label for="text">Text</label>
+    <input name="text" min="0">
+
+    <!-- Здесь будет список категорий.  -->
+    <select name="category" size="4">
+
+      {% for category in categories %}
+        <option value="{{ category.id }}">
+            {{ category.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <select name="user" size="4">
+
+      {% for user in users %}
+        <option value="{{ user.name }}">
+            {{ user }}
+        </option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Добавить пост">
+</form>
+{% endblock content %}
